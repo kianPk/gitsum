@@ -1,0 +1,14 @@
+[package]
+name = "gitsum"
+version = "1.0.0"
+edition = "2021"
+description = "Tiny, fast summary of the current git repository"
+license = "MIT"
+repository = "https://github.com/kianPk/gitsum"
+readme = "README.md"
+keywords = ["git", "cli", "devtools"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "gitsum"
+path = "src/main.rs"
