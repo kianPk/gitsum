@@ -9,6 +9,12 @@ fn run(args: &[&str]) -> Option<String> {
     Some(String::from_utf8_lossy(&out.stdout).trim().to_string())
 }
 
+fn stash_count() -> usize {
+    run(&["stash", "list"])
+        .map(|s| s.lines().filter(|l| !l.is_empty()).count())
+        .unwrap_or(0)
+}
+
 fn main() -> ExitCode {
     if env::args().any(|a| a == "-h" || a == "--help") {
         println!(
@@ -35,6 +41,7 @@ fn main() -> ExitCode {
     let commits = run(&["rev-list", "--count", "HEAD"]).unwrap_or_else(|| "?".into());
     let authors = run(&["shortlog", "-sn", "HEAD"]).unwrap_or_default();
     let last = run(&["log", "-1", "--format=%cr · %s"]).unwrap_or_else(|| "?".into());
+    let stashes = stash_count();
 
     let mut staged = 0;
     let mut unstaged = 0;
@@ -64,11 +71,12 @@ fn main() -> ExitCode {
     if let Some(ab) = ahead_behind {
         let parts: Vec<&str> = ab.split_whitespace().collect();
         if parts.len() == 2 {
-            println!("   sync     ↑{} ↓{}", parts[1], parts[0]);
+            println!("   sync     ↑{} ↓{} (upstream)", parts[1], parts[0]);
         }
     } else {
         println!("   sync     (no upstream)");
     }
+    println!("   stash    {stashes}");
     println!("   dirty    staged={staged} unstaged={unstaged} untracked={untracked}");
 
     let top: Vec<&str> = authors.lines().take(3).collect();
